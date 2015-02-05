@@ -39,12 +39,12 @@ var youWin = '+';
 var myCountdownSeconds;
 var start_tile_x = 3;
 var start_tile_y = 5
-
+function myalert() {
+    alert('hello');
+}
 function create() {
-
+    game.physics.startSystem(Phaser.Physics.ARCADE);
     game.input.mouse.enabled = false;
-    game.input.keyboard.enabled = true;
-    paddle = game.add.sprite(game.world.centerX, 500, 'breakout', 'paddle_big.png');
     map = game.add.tilemap('matching');
 
     map.addTilesetImage('Desert', 'tiles');
@@ -54,13 +54,23 @@ function create() {
     layer = map.createLayer('Ground');//.tilemapLayer(0, 0, 600, 600, tileset, map, 0);
 
     //layer.resizeWorld();
-    game.add.sprite(0, 0, 'dog')
+
+
     marker = game.add.graphics();
     marker.lineStyle(2, 0x00aaFF, 1);
     marker.drawRect(start_tile_x * 100, start_tile_y * 100, 100, 100);
 
     randomizeTiles();
-
+    player = game.add.sprite(0, 0, 'dog')
+    game.physics.arcade.enable(player)
+    //player.body.gravity.y = 300
+    player.body.collideWorldBounds = true;
+    //this.game.input.keyboard.addKeyCapture([Phaser.Keyboard.SPACEBAR]);
+    //this.input.keyboard.addKey(Phaser.Keyboard.UP).onDown.add(function () {player.y -= 100}, this);
+    this.input.keyboard.addKey(Phaser.Keyboard.UP).onDown.add(function () {player.y -= 100}, this);
+    this.input.keyboard.addKey(Phaser.Keyboard.DOWN).onDown.add(function () {player.y += 100}, this);
+    this.input.keyboard.addKey(Phaser.Keyboard.RIGHT).onDown.add(function () {player.x += 100}, this);
+    this.input.keyboard.addKey(Phaser.Keyboard.LEFT).onDown.add(function () {player.x -= 100}, this);
 }
 
 function update() {
