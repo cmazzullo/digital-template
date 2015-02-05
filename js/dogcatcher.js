@@ -119,7 +119,7 @@ function update() {
 
 function countDownTimer() {
 
-    var timeLimit = 60;
+    var timeLimit = 30;
 
     mySeconds = game.time.totalElapsedSeconds();
     myCountdownSeconds = timeLimit - mySeconds;
@@ -212,7 +212,7 @@ function getHiddenTile() {
 function render() {
 
     game.debug.text(timesUp, 620, 208, 'rgb(0,255,0)');
-    game.debug.text(youWin, 620, 240, 'rgb(0,255,0)');
+    // game.debug.text(youWin, 620, 240, 'rgb(0,255,0)');
 
     game.debug.text('Time: ' + Math.round(myCountdownSeconds), 620, 15, 'rgb(0,255,0)');
 
@@ -223,11 +223,11 @@ function render() {
     //game.debug.text('squareList: ' + myString2, 620, 240, 'rgb(255,0,0)');
 
 
-    game.debug.text('Tile: ' + map.getTile(layer.getTileX(player.x), layer.getTileY(player.y)).index, 620, 48, 'rgb(255,0,0)');
+    // game.debug.text('Tile: ' + map.getTile(layer.getTileX(player.x), layer.getTileY(player.y)).index, 620, 48, 'rgb(255,0,0)');
 
-    game.debug.text('LayerX: ' + layer.getTileX(player.x), 620, 80, 'rgb(255,0,0)');
-    game.debug.text('LayerY: ' + layer.getTileY(player.y), 620, 112, 'rgb(255,0,0)');
+    // game.debug.text('LayerX: ' + layer.getTileX(player.x), 620, 80, 'rgb(255,0,0)');
+    // game.debug.text('LayerY: ' + layer.getTileY(player.y), 620, 112, 'rgb(255,0,0)');
 
-    game.debug.text('Move Count: ' + move_count, 620, 144, 'rgb(255,0,0)');
+    // game.debug.text('Move Count: ' + move_count, 620, 144, 'rgb(255,0,0)');
     game.debug.text('Score: ' + score, 620, 176, 'rgb(255,0,0)');
 }
