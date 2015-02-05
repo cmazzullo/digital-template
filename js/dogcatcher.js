@@ -56,11 +56,9 @@ function create() {
     //tileset = game.add.tileset('tiles');
 
     layer = map.createLayer('Ground');//.tilemapLayer(0, 0, 600, 600, tileset, map, 0);
-
-    Phaser.world.setBounds(0, 0, xtiles * tile_dim, ytiles * tile_dim);
-
-
+    game.world.setBounds(0, 0, xtiles * tile_dim, ytiles * tile_dim);
     randomizeTiles();
+
     player = game.add.sprite(0, 0, 'dog')
     game.physics.arcade.enable(player)
     //player.body.gravity.y = 300
