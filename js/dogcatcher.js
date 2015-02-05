@@ -1,12 +1,12 @@
 // mods by Patrick OReilly
 // twitter: @pato_reilly
 
-var game = new Phaser.Game(800, 600, Phaser.CANVAS, 'phaser-example', { preload: preload, create: create, update: update, render: render });
+var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game', { preload: preload, create: create, update: update, render: render });
 
 function preload() {
-
+    game.load.image('dog', 'assets/dog.png');
     game.load.tilemap('matching', 'assets/phaser_tiles.json', null, Phaser.Tilemap.TILED_JSON);
-    game.load.image('tiles', 'assets/phaser_tiles.png');//, 100, 100, -1, 1, 1);
+    game.load.image('tiles', 'assets/phaser_tiles-numbered.png');//, 100, 100, -1, 1, 1);
 }
 
 var timeCheck = 0;
@@ -37,23 +37,27 @@ var timesUp = '+';
 var youWin = '+';
 
 var myCountdownSeconds;
-
+var start_tile_x = 3;
+var start_tile_y = 5
 
 function create() {
 
-        map = game.add.tilemap('matching');
+    game.input.mouse.enabled = false;
+    game.input.keyboard.enabled = true;
+    paddle = game.add.sprite(game.world.centerX, 500, 'breakout', 'paddle_big.png');
+    map = game.add.tilemap('matching');
 
-        map.addTilesetImage('Desert', 'tiles');
+    map.addTilesetImage('Desert', 'tiles');
 
-        //tileset = game.add.tileset('tiles');
+    //tileset = game.add.tileset('tiles');
 
-        layer = map.createLayer('Ground');//.tilemapLayer(0, 0, 600, 600, tileset, map, 0);
+    layer = map.createLayer('Ground');//.tilemapLayer(0, 0, 600, 600, tileset, map, 0);
 
-        //layer.resizeWorld();
-
-        marker = game.add.graphics();
-        marker.lineStyle(2, 0x00FF00, 1);
-        marker.drawRect(0, 0, 100, 100);
+    //layer.resizeWorld();
+    game.add.sprite(0, 0, 'dog')
+    marker = game.add.graphics();
+    marker.lineStyle(2, 0x00aaFF, 1);
+    marker.drawRect(start_tile_x * 100, start_tile_y * 100, 100, 100);
 
     randomizeTiles();
 
@@ -91,7 +95,7 @@ function countDownTimer() {
     myCountdownSeconds = timeLimit - mySeconds;
 
     if (myCountdownSeconds <= 0)
-        {
+    {
         // time is up
         timesUp = 'Time is up!';
     }
@@ -103,14 +107,14 @@ function processClick() {
     currentTilePosition = ((layer.getTileY(game.input.activePointer.worldY)+1)*6)-(6-(layer.getTileX(game.input.activePointer.worldX)+1));
 
     if (game.input.mousePointer.isDown)
-        {
+    {
         // check to make sure the tile is not already flipped
         if (currentTile.index == tileBack)
         {
             // get the corresponding item out of squareList
-                currentNum = squareList[currentTilePosition-1];
+            currentNum = squareList[currentTilePosition-1];
             flipOver();
-                squareCounter++;
+            squareCounter++;
             // is the second tile of pair flipped?
             if  (squareCounter == 2)
             {
@@ -132,15 +136,15 @@ function processClick() {
                 {
                     savedSquareX2 = layer.getTileX(marker.x);
                     savedSquareY2 = layer.getTileY(marker.y);
-                        flipFlag = true;
-                        timeCheck = game.time.totalElapsedSeconds();
+                    flipFlag = true;
+                    timeCheck = game.time.totalElapsedSeconds();
                 }
             }
             else
             {
                 savedSquareX1 = layer.getTileX(marker.x);
                 savedSquareY1 = layer.getTileY(marker.y);
-                    square1Num = currentNum;
+                square1Num = currentNum;
             }
         }
     }
