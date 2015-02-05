@@ -28,7 +28,6 @@ var map;
 var tileset;
 var layer;
 
-var marker;
 var currentTile;
 var currentTilePosition;
 
@@ -37,8 +36,13 @@ var timesUp = '+';
 var youWin = '+';
 
 var myCountdownSeconds;
+var tile_dim = 100;
+var xtiles = 6;
+var ytiles = 6;
 var start_tile_x = 3;
 var start_tile_y = 5
+var player;
+
 function myalert() {
     alert('hello');
 }
@@ -53,35 +57,31 @@ function create() {
 
     layer = map.createLayer('Ground');//.tilemapLayer(0, 0, 600, 600, tileset, map, 0);
 
-    //layer.resizeWorld();
+    Phaser.world.setBounds(0, 0, xtiles * tile_dim, ytiles * tile_dim);
 
-
-    marker = game.add.graphics();
-    marker.lineStyle(2, 0x00aaFF, 1);
-    marker.drawRect(start_tile_x * 100, start_tile_y * 100, 100, 100);
 
     randomizeTiles();
     player = game.add.sprite(0, 0, 'dog')
     game.physics.arcade.enable(player)
     //player.body.gravity.y = 300
     player.body.collideWorldBounds = true;
-    //this.game.input.keyboard.addKeyCapture([Phaser.Keyboard.SPACEBAR]);
-    //this.input.keyboard.addKey(Phaser.Keyboard.UP).onDown.add(function () {player.y -= 100}, this);
-    this.input.keyboard.addKey(Phaser.Keyboard.UP).onDown.add(function () {player.y -= 100}, this);
-    this.input.keyboard.addKey(Phaser.Keyboard.DOWN).onDown.add(function () {player.y += 100}, this);
-    this.input.keyboard.addKey(Phaser.Keyboard.RIGHT).onDown.add(function () {player.x += 100}, this);
-    this.input.keyboard.addKey(Phaser.Keyboard.LEFT).onDown.add(function () {player.x -= 100}, this);
+    game.input.keyboard.addKeyCapture([Phaser.Keyboard.SPACEBAR]);
+    this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR).onDown.add(function () {processClick();}, this);
+    this.input.keyboard.addKey(Phaser.Keyboard.UP).onDown.add(function () {player.y -= 100;}, this);
+    this.input.keyboard.addKey(Phaser.Keyboard.DOWN).onDown.add(function () {player.y += 100;}, this);
+    this.input.keyboard.addKey(Phaser.Keyboard.RIGHT).onDown.add(function () {player.x += 100;}, this);
+    this.input.keyboard.addKey(Phaser.Keyboard.LEFT).onDown.add(function () {player.x -= 100;}, this);
 }
 
 function update() {
 
     countDownTimer();
 
-    if (layer.getTileX(game.input.activePointer.worldX) <= 5) // to prevent the marker from going out of bounds
-    {
-        marker.x = layer.getTileX(game.input.activePointer.worldX) * 100;
-        marker.y = layer.getTileY(game.input.activePointer.worldY) * 100;
-    }
+    // if (layer.getTileX(game.input.activePointer.worldX) <= 5) // to prevent the marker from going out of bounds
+    // {
+    //     marker.x = layer.getTileX(game.input.activePointer.worldX) * 100;
+    //     marker.y = layer.getTileY(game.input.activePointer.worldY) * 100;
+    // }
 
     if (flipFlag == true)
     {
@@ -89,10 +89,6 @@ function update() {
         {
             flipBack();
         }
-    }
-    else
-    {
-        processClick();
     }
 }
 
@@ -113,56 +109,23 @@ function countDownTimer() {
 
 function processClick() {
 
-    currentTile = map.getTile(layer.getTileX(marker.x), layer.getTileY(marker.y));
-    currentTilePosition = ((layer.getTileY(game.input.activePointer.worldY)+1)*6)-(6-(layer.getTileX(game.input.activePointer.worldX)+1));
+    currentTile = map.getTile(layer.getTileX(player.x), layer.getTileY(player.y));
+    currentTilePosition = ((layer.getTileY(player.y)+1)*6)-(6-(layer.getTileX(player.x)+1));
 
-    if (game.input.mousePointer.isDown)
+    // check to make sure the tile is not already flipped
+    if (currentTile.index == tileBack)
     {
-        // check to make sure the tile is not already flipped
-        if (currentTile.index == tileBack)
-        {
-            // get the corresponding item out of squareList
-            currentNum = squareList[currentTilePosition-1];
-            flipOver();
-            squareCounter++;
-            // is the second tile of pair flipped?
-            if  (squareCounter == 2)
-            {
-                // reset squareCounter
-                squareCounter = 0;
-                square2Num = currentNum;
-                // check for match
-                if (square1Num == square2Num)
-                {
-                    masterCounter++;
-
-                    if (masterCounter == 18)
-                    {
-                        // go "win"
-                        youWin = 'Got them all!';
-                    }
-                }
-                else
-                {
-                    savedSquareX2 = layer.getTileX(marker.x);
-                    savedSquareY2 = layer.getTileY(marker.y);
-                    flipFlag = true;
-                    timeCheck = game.time.totalElapsedSeconds();
-                }
-            }
-            else
-            {
-                savedSquareX1 = layer.getTileX(marker.x);
-                savedSquareY1 = layer.getTileY(marker.y);
-                square1Num = currentNum;
-            }
-        }
+        // get the corresponding item out of squareList
+        currentNum = squareList[currentTilePosition-1];
+        flipOver();
+        squareCounter++;
     }
+
 }
 
 function flipOver() {
 
-    map.putTile(currentNum, layer.getTileX(marker.x), layer.getTileY(marker.y));
+    map.putTile(currentNum, layer.getTileX(player.x), layer.getTileY(player.y));
 }
 
 function flipBack() {
@@ -233,10 +196,10 @@ function render() {
     //game.debug.text('squareList: ' + myString2, 620, 240, 'rgb(255,0,0)');
 
 
-    game.debug.text('Tile: ' + map.getTile(layer.getTileX(marker.x), layer.getTileY(marker.y)).index, 620, 48, 'rgb(255,0,0)');
+    game.debug.text('Tile: ' + map.getTile(layer.getTileX(player.x), layer.getTileY(player.y)).index, 620, 48, 'rgb(255,0,0)');
 
-    game.debug.text('LayerX: ' + layer.getTileX(marker.x), 620, 80, 'rgb(255,0,0)');
-    game.debug.text('LayerY: ' + layer.getTileY(marker.y), 620, 112, 'rgb(255,0,0)');
+    game.debug.text('LayerX: ' + layer.getTileX(player.x), 620, 80, 'rgb(255,0,0)');
+    game.debug.text('LayerY: ' + layer.getTileY(player.y), 620, 112, 'rgb(255,0,0)');
 
     game.debug.text('Tile Position: ' + currentTilePosition, 620, 144, 'rgb(255,0,0)');
     game.debug.text('Hidden Tile: ' + getHiddenTile(), 620, 176, 'rgb(255,0,0)');
