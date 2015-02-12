@@ -9,12 +9,13 @@ var toast;
 var playerAction;
 var cursors;
 var jumpButton;
-var player_speed = 700;
-var jump_speed = -600;
-var gravity = 3000;
-var toast_gravity = -3;
+var player_speed = 400;
+var jump_speed = -400;
+var gravity = 700;
+var toast_gravity = 50;
 var first = function(game) {};
-
+var fx;
+var winfx;
 first.prototype = {
     preload: function() {
 	this.game.load.image("loading", "assets/loading.png");
@@ -30,21 +31,21 @@ var boot = function(game) {};
 
 boot.prototype = {
     preload: function() {
+	this.game.load.audio('ping', 'assets/SoundEffects/pickup.wav');
+	this.game.load.audio('squit', 'assets/SoundEffects/numkey.wav');
 	this.game.load.image('win', 'assets/win.png');
+	this.game.load.image('lose', 'assets/lose.png');
+	this.game.load.image('sky', 'assets/sky.png');
+	this.game.load.image('menubg', 'assets/menu.png');
 	this.game.load.image("loading", "assets/loading.png");
 	var loadingBar = this.add.sprite(160,240,"loading");
 	loadingBar.anchor.setTo(0.5,0.5);
 	this.load.setPreloadSprite(loadingBar);
-
 	this.game.load.image('ground', 'assets/platform.png');
 	this.game.load.image("main", "assets/background3.png");
 	this.game.load.image('tiles-1', 'assets/tiles-1.png');
-	this.game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
 	this.game.load.spritesheet('butter', 'assets/butter.png', 26, 48);
 	this.game.load.spritesheet('toast', 'assets/toast.png', 50, 50);
-	this.game.load.spritesheet('droid', 'assets/droid.png', 32, 32);
-	this.game.load.image('starSmall', 'assets/star.png');
-	this.game.load.image('starBig', 'assets/star2.png');
 	this.game.load.image('background', 'assets/background2.png');
     },
     create: function() {
@@ -63,6 +64,7 @@ var menu = function(game) {};
 menu.prototype = {
     create: function() {
 	game.stage.backgroundColor = '#0000FF';
+	bg = game.add.tileSprite(0, 0, 800, 600, 'menubg');
 	jumpButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 	jumpButton.onDown.add(function () {
 	    game.state.start("Main");
@@ -78,10 +80,15 @@ var collect_toast = function () {
     game.state.start("Win");
 }
 
+var die = function () {
+    game.state.start("Lose");
+}
+
 main.prototype = {
     create: function() {
 
 	this.game.stage.backgroundColor = '#111111';
+	game.add.sprite(0, 0, 'sky');
 	// bg = game.add.tileSprite(0, 0, 800, 600, 'background');
 
 	game.input.mouse.enabled = false;
@@ -91,46 +98,48 @@ main.prototype = {
 	jumpButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 	game.physics.startSystem(Phaser.Physics.ARCADE);
 
-	toast = game.add.sprite(400, 400, 'toast');
+	toast = game.add.sprite(3, 3, 'toast');
 	game.physics.enable(toast, Phaser.Physics.ARCADE);
 	toast.body.collideWorldBounds = true;
-	toast.body.setSize(20, 32, 5, 16);
+	toast.body.setSize(50, 32, 5, 16);
 	toast.body.gravity.y = toast_gravity;
+	toast.body.bounce.set(1);
 
-	player = game.add.sprite(32, 32, 'butter');
+	player = game.add.sprite(150, 600 - 96, 'butter');
 	game.physics.enable(player, Phaser.Physics.ARCADE);
 	player.body.collideWorldBounds = true;
 	player.body.setSize(20, 32, 5, 16);
-
-	//  A simple background for our game
-	// game.add.sprite(0, 0, 'sky');
 
 	//  The platforms group contains the ground and the 2 ledges we can jump on
 	platforms = game.add.group();
 	//  We will enable physics for any object that is created in this group
 	platforms.enableBody = true;
-	// Here we create the ground.
-	var ground = platforms.create(0, game.world.height - 64, 'ground');
-	//  Scale it to fit the width of the game (the original sprite is 400x32 in size)
-	ground.scale.setTo(2, 2);
-	ground.body.immovable = true;
-	// platforms.create(400, 400, 'ground').body.immovable = true;
-	// platforms.create(-150, 250, 'ground').body.immovable = true;
-	// platforms.create(150, 150, 'ground').body.immovable = true;
+	//var ground = platforms.create(0, game.world.height - 32, 'ground');
+	//ground.scale.setTo(2, 2);
+	//ground.body.immovable = true;
 	var make_platform = function (x, y) {
-	    platforms.create(x, y, 'ground').body.immovable = true;
+	    platforms.create(x, y - 32, 'ground').body.immovable = true;
 	}
-	make_platform(400, 400);
-	make_platform(-150, 250);
-	make_platform(150, 150);
+	make_platform(100, 600); // ground, 1
+	make_platform(400, 500);
+	make_platform(500, 400);
+	make_platform(100, 300);
+	make_platform(400, 200);
+	make_platform(-100, 100);
 
 
 	player.body.gravity.y = gravity;
+	fx = game.add.audio('squit');
+	winfx = game.add.audio('ping');
 
     },
     update: function() {
 	game.physics.arcade.collide(player, platforms);
+	game.physics.arcade.collide(toast, platforms);
 	game.physics.arcade.overlap(player, toast, collect_toast, null, this);
+	if (player.position.y > (600 - 62) ) {
+	    die();
+	}
 	player.body.velocity.x = 0;
         if (cursors.left.isDown)
 	{
@@ -143,6 +152,7 @@ main.prototype = {
 	if (jumpButton.isDown && player.body.touching.down)
 	{
             player.body.velocity.y = jump_speed;
+	    fx.play()
 	}
     }
 }
@@ -153,7 +163,25 @@ var win = function(game) {};
 
 win.prototype = {
     create: function() {
+
 	game.add.sprite(0, 0, 'win');
+	jumpButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+	jumpButton.onDown.add(function () {
+	    game.state.start("Main");
+	});
+	winfx = game.add.audio('ping');
+	winfx.play();
+    }
+}
+
+game.state.add("Win", win);
+
+
+var lose = function(game) {};
+
+lose.prototype = {
+    create: function() {
+	game.add.sprite(0, 0, 'lose');
 	jumpButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 	jumpButton.onDown.add(function () {
 	    game.state.start("Main");
@@ -161,8 +189,6 @@ win.prototype = {
     }
 }
 
-game.state.add("Win", win);
-
-
+game.state.add("Lose", lose);
 
 game.state.start("First");
