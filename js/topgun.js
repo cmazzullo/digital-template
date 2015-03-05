@@ -35,8 +35,8 @@ var states = [
 		game.load.image('bg', 'assets/ex-bg.png');
 		game.load.spritesheet('ship', 'assets/topgun/ship.png', 144, 160);
 		game.load.spritesheet('smallbg', 'assets/topgun/smallbg.png', 144, 160);
-		game.load.bitmapFont('desyrel', '/assets/topgun/desyrel.png',
-				     '/assets/topgun/desyrel.xml');
+		game.load.bitmapFont('desyrel', 'assets/topgun/desyrel.png',
+				     'assets/topgun/desyrel.xml');
 	    },
 	    create: function () {
 		game.state.start('main');
