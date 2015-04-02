@@ -60,8 +60,9 @@ var states = [
 	var tag;
 	var take_portal;
 	var player_speed = 100;
-	var collect_cell = function() {
-	    game.state.start("Win");
+
+	var collect_cell = function(player, cell) {
+	    cell.frame = 1;
 	}
 
 	return {
@@ -79,10 +80,20 @@ var states = [
 
 		cells = game.add.group();
 		cells.enableBody = true;
+		cells.collideWorldBounds = true;
 		var make_cell = function (x, y) {
-		    cells.create(x, y - 32, 'cell');
+		    var cell = cells.create(x, y - 32, 'cell');
+		    game.physics.arcade.enable(cell);
+		    cell.body.collideWorldBounds = true;
+		    cell.body.bounce.set = 1;
+		    cell.body.gravity.y = 0;
 		}
 		make_cell(100, 100);
+		make_cell(100, 200);
+		make_cell(175, 250);
+		make_cell(375, 350);
+		make_cell(120, 500);
+		make_cell(500, 120);
 
 		// Add Keys
 		w = game.input.keyboard.addKey(Phaser.Keyboard.W);
@@ -111,8 +122,9 @@ var states = [
 
 	    },
 	    update: function() {
-		//game.physics.arcade.collide(player, cells);
 		game.physics.arcade.overlap(player, cells, collect_cell, null, this);
+		game.physics.arcade.collide(player, cells);
+
 		player.body.velocity.x = 0;
 		player.body.velocity.y = 0;
 		if (cursors.left.isDown)
