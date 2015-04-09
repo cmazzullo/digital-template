@@ -36,13 +36,13 @@ loading.prototype = {
 	this.game.load.audio('squit', 'assets/SoundEffects/numkey.wav');
 	this.game.load.image('win', 'assets/win.png');
 	this.game.load.image('lose', 'assets/lose.png');
-	this.game.load.image('sky', 'assets/sky.png');
+	this.game.load.image('sky', 'assets/sky2.png');
 	this.game.load.image('menubg', 'assets/menu.png');
 	this.game.load.image("loading", "assets/loading.png");
 	var loadingBar = this.add.sprite(160,240,"loading");
 	loadingBar.anchor.setTo(0.5,0.5);
 	this.load.setPreloadSprite(loadingBar);
-	this.game.load.image('ground', 'assets/platform.png');
+	this.game.load.image('ground', 'assets/platform2.png');
 	this.game.load.image("main", "assets/background3.png");
 	this.game.load.image('tiles-1', 'assets/tiles-1.png');
 	this.game.load.spritesheet('butter', 'assets/butter.png', 26, 48);
