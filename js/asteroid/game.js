@@ -1,3 +1,5 @@
+'use strict'
+
 var gamestate = function(game) {
     var sprite;
     var cursors;
@@ -6,10 +8,13 @@ var gamestate = function(game) {
     var bulletTime = 0;
     var asteroids;
 
+    var music;
     var explodefx;
     var bulletfx;
     var minefx;
     var deathfx;
+    var explosion;
+    var anim;
 
     var explode = function (sprite, asteroid) {
 	explodefx.play();
@@ -17,15 +22,17 @@ var gamestate = function(game) {
 	lives --;
 	livestext.setText("Lives: " + lives);
 	console.log('you lose');
-	var explosion = game.add.sprite(sprite.body.x, sprite.body.y, 'explosion');
+	explosion = game.add.sprite(sprite.body.x, sprite.body.y, 'explosion');
 	explosion.scale.x = .5;
 	explosion.scale.y = .5;
 	explosion.anchor.setTo(0.3, 0.6);
 	anim = explosion.animations.add ("explode");
 	anim.killOnComplete=true;
 	anim.play();
+	asteroid.body.x = -100;
 	asteroid.kill();
 	if (lives <= 0) {
+	    music.stop();
 	    deathfx.play();
 	    game.state.start('lose');
 	}
@@ -41,16 +48,18 @@ var gamestate = function(game) {
 
     var mine = function (asteroid, bullet) {
 	minefx.play();
+	console.log('mining');
 	score ++;
 	scoretext.setText("Minerals: " + score);
 	var explosion = game.add.sprite(asteroid.body.x, asteroid.body.y, 'explosion');
 	explosion.anchor.setTo(0.3, 0.6);
-	anim = explosion.animations.add ("explode");
+	var anim = explosion.animations.add ("explode");
 	anim.killOnComplete=true;
 	anim.play();
 	asteroid.kill();
 	bullet.kill();
 	if (score >= maxscore) {
+	    music.stop();
 	    game.state.start('win');
 	}
     }
@@ -116,20 +125,20 @@ var gamestate = function(game) {
 
 	// Emitter for asteroids
 	var emit = function (key, period) {
-	    var emitter = game.add.emitter(game.world.centerX, -50, 500);
+	    var emitter = game.add.emitter(game.world.centerX, -50, 50);
 	    emitter.width = game.world.width;
 	    emitter.makeParticles(key, 1);
 	    emitter.minParticleScale = 0.9;
 	    emitter.maxParticleScale = 1.1;
 	    emitter.setYSpeed(50, 100);
-	    emitter.setXSpeed(-5, 5);
+	    emitter.setXSpeed(-100, 100);
 	    emitter.minRotation = -30;
 	    emitter.maxRotation = 30;
 	    emitter.start(false, 3200, period);
 	    return emitter
 	}
 
-	asteroids = emit('asteroid', 500);
+	asteroids = emit('asteroid', 300);
 
 	// Show the score
 	scoretext = game.add.text(
@@ -168,9 +177,17 @@ var gamestate = function(game) {
 	);
 	heattext.setText("Heat: " + heat);
 
+	// Add sound
+	explodefx = game.add.audio('squit');
+	bulletfx = game.add.audio('fire');
+	minefx = game.add.audio('explode');
+	deathfx = game.add.audio('death');
+
+
     }
 
     function update() {
+	//console.log();
 	if (cursors.up.isDown)
 	{
             game.physics.arcade.accelerationFromRotation(sprite.rotation, 200, sprite.body.acceleration);
@@ -202,18 +219,13 @@ var gamestate = function(game) {
 
 	bullets.forEachExists(screenWrap, this);
 
-	// Add sound
-	explodefx = game.add.audio('squit');
-	bulletfx = game.add.audio('fire');
-	minefx = game.add.audio('explode');
-	deathfx = game.add.audio('death');
-
 	// Overlap
 	game.physics.arcade.overlap(asteroids, sprite, explode, null, this);
 	game.physics.arcade.overlap(asteroids, bullets, mine, null, this);
 
 	// Collision
 	game.physics.arcade.collide(asteroids, sprite);
+	game.physics.arcade.collide(asteroids, asteroids);
 
     }
 
@@ -229,7 +241,7 @@ var gamestate = function(game) {
 		bullet.lifespan = 800;
 		bullet.rotation = sprite.rotation;
 		game.physics.arcade.velocityFromRotation(sprite.rotation, 200, bullet.body.velocity);
-		bulletTime = game.time.now + 500;
+		bulletTime = game.time.now + 250;
             }
 	}
 
