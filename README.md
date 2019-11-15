@@ -6,7 +6,7 @@ In 2015 I signed up for a game design course to fulfill the requirements for a C
 while finishing up a Physics Batchelor's. The semester ended up being pretty demanding, and the game
 design course mandated one game submission per week.
 
-Behold the shittacular results here http://cmazzullo.github.io/digital-template/
+Behold the shittacular results here https://cmazzullo.github.io/digital-template/
 
 ...
 
